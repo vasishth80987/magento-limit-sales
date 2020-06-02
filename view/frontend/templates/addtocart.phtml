@@ -136,7 +136,7 @@ if($customerId) {
             <?php endif; ?>
             <div class="actions">
                 <?php if($check_sales_limit && !$customerId):?>
-                    <p style="background: #fae5e5;color: #4a1716;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
+                    <p style="background: #fae5e5;color: #4a1716;padding: 5px 10px;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
                 <?php else:?>
                     <button type="submit"
                             title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
