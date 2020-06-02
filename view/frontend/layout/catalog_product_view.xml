@@ -23,10 +23,5 @@
                 </referenceBlock>
             </referenceBlock>
         </referenceContainer>
-        <referenceBlock name="minicart">
-            <action method="setTemplate">
-                <argument name="template" xsi:type="string">Vsynch_LimitSales::minicart.phtml</argument>
-            </action>
-        </referenceBlock>
     </body>
 </page>
