@@ -37,21 +37,7 @@ class InstallData implements InstallDataInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-    {
-        /**
-         * Install messages
-         */
-        /*
-         * $data = [
-            ['message' => 'Happy New Year'],
-            ['message' => 'Merry Christmas']
-        ];
-        foreach ($data as $bind) {
-            $setup->getConnection()
-                ->insertForce($setup->getTable('greeting_message'), $bind);
-        }
-        */
-
+    {        
         $eavSetup = $this->eavSetupFactory->create();
         $eavSetup->addAttribute(
             \Magento\Catalog\Model\Product::ENTITY,
