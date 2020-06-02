@@ -1,0 +1,156 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');
+$productId = $product->getId();
+$psl = $product->getData('limit_sales');
+$psltf = $product->getData('limit_sales_time_frame');
+
+//echo $product->getName();
+
+$viewModel = $block->getViewModel();
+$customerId = $viewModel->getCustomerId();
+
+$check_sales_limit = true;
+$check_sales_limit_time_frame = true;
+$allowed_sales = 0;
+$qtf = 0;
+$wait = false;
+$wait_time = 0;
+$cart_entries = 0;
+$cart_item_id = 0;
+
+if($customerId) {
+
+    $cart = $objectManager->get('\Magento\Checkout\Model\Cart')->getQuote();
+
+    foreach ($cart->getAllVisibleItems() as $item) {
+        if ($productId == $item->getProductId()){
+            $cart_entries += $item->getQty();
+            $cart_item_id = $item->getId();
+        }
+    }
+    if (!empty($customerId))
+        if (empty($psl)) {
+            $check_sales_limit = false;
+            $check_sales_limit_time_frame = false;
+            $allowed_sales = -1;
+        }
+    else {
+        if (empty($psltf)) $check_sales_limit_time_frame = false;
+
+        $connection = $objectManager->get('Magento\Framework\App\ResourceConnection')->getConnection();
+        $table = 'limit_sales_instances';
+
+        $query = "SELECT * FROM " . $table . " WHERE product_id = " . $productId . " AND user_id = " . $customerId;
+        $result1 = $connection->fetchAll($query);
+        if (count($result1) != 0) {
+            foreach ($result1 as $result) {
+
+                $sales = json_decode($result['sales']);
+                $salestf = [];
+                $qtf = 0;
+
+                if ($check_sales_limit_time_frame && $psltf != -1) {
+                    foreach ($sales as $sale) {
+                        if ($psltf > (time() - $sale->time)) $salestf[] = $sale;
+                    }
+                } elseif ($psltf == -1) {
+                    $check_sales_limit_time_frame = false;
+                    $salestf = $sales;
+                }
+
+                foreach ($salestf as $sale) $qtf += $sale->quantity;
+
+                $allowed_sales = $psl - $qtf;
+
+                if (count($salestf) > 0) $wait_time = $salestf[0]->time + $psltf - time();
+
+                // Time difference in seconds
+                $sec = $wait_time;
+                $min = $wait_time / 60;
+                $hrs = $wait_time / 3600;
+                $days = floor($wait_time / 86400);
+                $hrs = floor($hrs - $days * 24);
+                $min = floor($min - $hrs * 60 - $days * 24 * 60);
+                $sec = floor($sec - $min * 60 - $hrs * 60 * 60 - $days * 24 * 60 * 60);
+
+                if ($days || $hrs || $min || $sec) $wait = true;
+
+                $wait_time = sprintf("%02d", $days) . " Day(s) " . sprintf("%02d", $hrs) . " Hour(s) " . sprintf("%02d", $min) . " Min(s) " . sprintf("%02d", $sec) . " Second(s)";
+
+            }
+        } else $allowed_sales = $psl;
+    }
+}
+
+?>
+<?php $_product = $block->getProduct(); ?>
+<?php $buttonTitle = __('Add to Cart'); ?>
+<?php if ($_product->isSaleable()) :?>
+    <div class="box-tocart">
+        <div class="fieldset">
+            <?php if ($block->shouldRenderQuantity()) :?>
+                <div class="field qty">
+                    <label class="label" for="qty"><span><?= $block->escapeHtml(__('Qty')) ?></span></label>
+                    <div class="control">
+                        <input type="number" <?=($customerId && $check_sales_limit && $allowed_sales<=0)?'disabled':''?>
+                               name="qty"
+                               id="qty"
+                               min="0"
+                               <?=($customerId && $check_sales_limit && $allowed_sales>0)?'max='.$allowed_sales:''?>
+                               value="<?= $block->getProductDefaultQty() * 1 ?>"
+                               title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                               class="input-text qty"
+                               data-validate="<?= $block->escapeHtmlAttr(json_encode($block->getQuantityValidators())) ?>"
+                        />
+                        <br><br>
+                        <?php if ($check_sales_limit) :?>
+                        <p style="background-color:
+                            rgb(243, 121, 59);
+                            padding: 5px 10px;
+                            color:
+                            white;
+                            display:none" id="LimitSalesWarning1">
+                            There is a Sales Limit set on this product!
+                            You cannot purchase more than <?=$allowed_sales-$cart_entries?> unit(s) of this product at this moment.
+                            <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
+                        </p>
+                        <p style="background-color:
+                            rgb(243, 121, 59);
+                            padding: 5px 10px;
+                            color:
+                            white;
+                            display:none" id="LimitSalesWarning2">You have reached the Sales Limit for this product.
+                            <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                        class="action primary tocart"
+                        id="product-addtocart-button" disabled>
+                    <span><?= $block->escapeHtml($buttonTitle) ?></span>
+                </button>
+                <?= $block->getChildHtml('', true) ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/js/validate-product": {}
+            <?php if ($customerId && $check_sales_limit) :?>,"limit_sales": {"allowed_sales": <?=$allowed_sales?>,"cart_item_id":<?=$cart_item_id?>,"cart_entries":<?=$cart_entries?>}<?php endif; ?>
+        }
+    }
+</script>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart" remove="true"></referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional" remove="true"></referenceBlock>
+        <referenceContainer name="product.info.form.content">
+            <block class="Magento\Catalog\Block\Product\View" name="vsynch.limit.sales.product.info.addtocart" as="addtocart2" template="Vsynch_LimitSales::addtocart.phtml" cacheable='false'>
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Vsynch\LimitSales\ViewModel\AddToCartForm</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="product.info.main">
+            <referenceBlock name="product.info.form.options">
+                <referenceBlock name="product.info.form.options">
+                    <referenceBlock name="product.info.options.wrapper.bottom">
+                        <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.additional2" as="vsynch.limit.sales.product.info.addtocart" template="Vsynch_LimitSales::addtocart.phtml" cacheable="false">
+                            <arguments>
+                                <argument name="view_model" xsi:type="object">Vsynch\LimitSales\ViewModel\AddToCartForm</argument>
+                            </arguments>
+                        </block>
+                    </referenceBlock>
+                </referenceBlock>
+            </referenceBlock>
+        </referenceContainer>
+        <referenceBlock name="minicart">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Vsynch_LimitSales::minicart.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

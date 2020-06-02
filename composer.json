@@ -1,0 +1,23 @@
+{
+    "name": "vsynchdi/limit-sales",
+    "description": "A Magento 2.3 package to the set max amount of purchases that can be made for selected products within a specified time period.",
+    "type": "module",
+    "require": {
+        "php": "7.2",
+        "magento/framework": "102.0.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vash Ish",
+            "email": "vash@vsynchdigitalsolutions.com.au"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+      "files": [ "registration.php" ],
+      "psr-4": {
+        "Vsynch\\LimitSales\\": ""
+      }
+    }
+}

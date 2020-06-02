@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Controller\Sidebar\UpdateItemQty">
+        <plugin name="vsynch-sales-limit-minicart" type="Vsynch\LimitSales\Observer\SideBar\UpdateItemQty" sortOrder="1" />
+    </type>
+    <type name="Magento\Checkout\Controller\Cart\UpdateItemQty">
+        <plugin name="vsynch-sales-limit-cart" type="Vsynch\LimitSales\Observer\Cart\UpdateItemQty" sortOrder="1" />
+    </type>
+    <type name="Magento\Sales\Controller\Order\Reorder">
+        <plugin name="vsynch-sales-limit-reorder" type="Vsynch\LimitSales\Observer\Sales\Reorder" sortOrder="1" />
+    </type>
+</config>
