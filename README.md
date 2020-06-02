@@ -18,3 +18,8 @@ Follow steps detailed here, https://docs.magento.com/user-guide/sales/checkout-g
 
 ## Usage
 
+Step 1: Login in to Admin Panel
+Step 2: Browse to Product Add/Edit pages.
+Step 3: Set Fields - `Purchases Limited To`  and  `Purchases Limited For` (later is optional)
+Step 4: Go To the shop front -> Login as user and see the module in action!
+Step 5: Have fun!
