@@ -8,6 +8,10 @@ Magento 2.3+
 ```
 composer require vsynch/limit-sales
 ```
+Run Magento Upgrade
+``
+php bin/magento setup:upgrade
+``
 
 ## Usage
 
