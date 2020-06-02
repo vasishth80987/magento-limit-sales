@@ -139,7 +139,7 @@ if($customerId) {
                     <p style="background: #fae5e5;color: #4a1716;padding: 5px 10px;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
                     <a title="Login/Register"
                             class="action primary"
-                            id="product-login-button">
+                            id="product-login-button" href="<?=$block->getUrl('customer/account/login')?>">
                         <span>Login/Register</span>
                     </a>
                 <?php else:?>
