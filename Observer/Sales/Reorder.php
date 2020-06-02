@@ -22,7 +22,6 @@ class Reorder
     protected $quoteItemFactory;
     protected $productFactory;
     protected $cart;
-    protected $checkoutSession;
     protected $modified;
     protected $messageManager;
     protected $resultRedirectFactory;
@@ -33,7 +32,6 @@ class Reorder
         coreData $jsonHelper,
         \Magento\Framework\Registry $registry,
         Cart $cart,\Magento\Framework\Message\ManagerInterface $messageManager,
-        CheckoutSession $checkoutSession,
         ProductFactory $productFactory,
         \Magento\Framework\Controller\ResultFactory $resultRedirectFactory,
         \Magento\Sales\Controller\AbstractController\OrderLoaderInterface $orderLoader,
@@ -44,7 +42,6 @@ class Reorder
         $this->registry = $registry;
         $this->messageManager = $messageManager;
         $this->productFactory = $productFactory;
-        $this->checkoutSession = $checkoutSession;
         $this->cart = $cart;
         $this->modified = [];
         $this->resultRedirectFactory = $resultRedirectFactory;

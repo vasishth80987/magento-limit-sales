@@ -42,52 +42,52 @@ if($customerId) {
             $check_sales_limit_time_frame = false;
             $allowed_sales = -1;
         }
-    else {
-        if (empty($psltf)) $check_sales_limit_time_frame = false;
+        else {
+            if (empty($psltf)) $check_sales_limit_time_frame = false;
 
-        $connection = $objectManager->get('Magento\Framework\App\ResourceConnection')->getConnection();
-        $table = 'limit_sales_instances';
+            $connection = $objectManager->get('Magento\Framework\App\ResourceConnection')->getConnection();
+            $table = 'limit_sales_instances';
 
-        $query = "SELECT * FROM " . $table . " WHERE product_id = " . $productId . " AND user_id = " . $customerId;
-        $result1 = $connection->fetchAll($query);
-        if (count($result1) != 0) {
-            foreach ($result1 as $result) {
+            $query = "SELECT * FROM " . $table . " WHERE product_id = " . $productId . " AND user_id = " . $customerId;
+            $result1 = $connection->fetchAll($query);
+            if (count($result1) != 0) {
+                foreach ($result1 as $result) {
 
-                $sales = json_decode($result['sales']);
-                $salestf = [];
-                $qtf = 0;
+                    $sales = json_decode($result['sales']);
+                    $salestf = [];
+                    $qtf = 0;
 
-                if ($check_sales_limit_time_frame && $psltf != -1) {
-                    foreach ($sales as $sale) {
-                        if ($psltf > (time() - $sale->time)) $salestf[] = $sale;
+                    if ($check_sales_limit_time_frame && $psltf != -1) {
+                        foreach ($sales as $sale) {
+                            if ($psltf > (time() - $sale->time)) $salestf[] = $sale;
+                        }
+                    } elseif ($psltf == -1) {
+                        $check_sales_limit_time_frame = false;
+                        $salestf = $sales;
                     }
-                } elseif ($psltf == -1) {
-                    $check_sales_limit_time_frame = false;
-                    $salestf = $sales;
+
+                    foreach ($salestf as $sale) $qtf += $sale->quantity;
+
+                    $allowed_sales = $psl - $qtf;
+
+                    if (count($salestf) > 0) $wait_time = $salestf[0]->time + $psltf - time();
+
+                    // Time difference in seconds
+                    $sec = $wait_time;
+                    $min = $wait_time / 60;
+                    $hrs = $wait_time / 3600;
+                    $days = floor($wait_time / 86400);
+                    $hrs = floor($hrs - $days * 24);
+                    $min = floor($min - $hrs * 60 - $days * 24 * 60);
+                    $sec = floor($sec - $min * 60 - $hrs * 60 * 60 - $days * 24 * 60 * 60);
+
+                    if ($days || $hrs || $min || $sec) $wait = true;
+
+                    $wait_time = sprintf("%02d", $days) . " Day(s) " . sprintf("%02d", $hrs) . " Hour(s) " . sprintf("%02d", $min) . " Min(s) " . sprintf("%02d", $sec) . " Second(s)";
+
                 }
-
-                foreach ($salestf as $sale) $qtf += $sale->quantity;
-
-                $allowed_sales = $psl - $qtf;
-
-                if (count($salestf) > 0) $wait_time = $salestf[0]->time + $psltf - time();
-
-                // Time difference in seconds
-                $sec = $wait_time;
-                $min = $wait_time / 60;
-                $hrs = $wait_time / 3600;
-                $days = floor($wait_time / 86400);
-                $hrs = floor($hrs - $days * 24);
-                $min = floor($min - $hrs * 60 - $days * 24 * 60);
-                $sec = floor($sec - $min * 60 - $hrs * 60 * 60 - $days * 24 * 60 * 60);
-
-                if ($days || $hrs || $min || $sec) $wait = true;
-
-                $wait_time = sprintf("%02d", $days) . " Day(s) " . sprintf("%02d", $hrs) . " Hour(s) " . sprintf("%02d", $min) . " Min(s) " . sprintf("%02d", $sec) . " Second(s)";
-
-            }
-        } else $allowed_sales = $psl;
-    }
+            } else $allowed_sales = $psl;
+        }
 }
 
 ?>
@@ -104,7 +104,7 @@ if($customerId) {
                                name="qty"
                                id="qty"
                                min="0"
-                               <?=($customerId && $check_sales_limit && $allowed_sales>0)?'max='.$allowed_sales:''?>
+                            <?=($customerId && $check_sales_limit && $allowed_sales>0)?'max='.$allowed_sales:''?>
                                value="<?= $block->getProductDefaultQty() * 1 ?>"
                                title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
                                class="input-text qty"
@@ -112,24 +112,24 @@ if($customerId) {
                         />
                         <br><br>
                         <?php if ($check_sales_limit) :?>
-                        <p style="background-color:
+                            <p style="background-color:
                             rgb(243, 121, 59);
                             padding: 5px 10px;
                             color:
                             white;
                             display:none" id="LimitSalesWarning1">
-                            There is a Sales Limit set on this product!
-                            You cannot purchase more than <?=$allowed_sales-$cart_entries?> unit(s) of this product at this moment.
-                            <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
-                        </p>
-                        <p style="background-color:
+                                There is a Sales Limit set on this product!
+                                You cannot purchase more than <?=max($allowed_sales-$cart_entries,0)?> unit(s) of this product at this moment.
+                                <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
+                            </p>
+                            <p style="background-color:
                             rgb(243, 121, 59);
                             padding: 5px 10px;
                             color:
                             white;
                             display:none" id="LimitSalesWarning2">You have reached the Sales Limit for this product.
-                            <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
-                        </p>
+                                <?if($check_sales_limit_time_frame && $wait){?>Please wait <?=$wait_time?> to purchase more items of this product.<?}?>
+                            </p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -138,8 +138,8 @@ if($customerId) {
                 <?php if($check_sales_limit && !$customerId):?>
                     <p style="background: #fae5e5;color: #4a1716;padding: 5px 10px;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
                     <a title="Login/Register"
-                            class="action primary"
-                            id="product-login-button" href="<?=$block->getUrl('customer/account/login')?>">
+                       class="action primary"
+                       id="product-login-button" href="<?=$block->getUrl('customer/account/login')?>">
                         <span>Login/Register</span>
                     </a>
                 <?php else:?>

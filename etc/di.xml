@@ -9,4 +9,7 @@
     <type name="Magento\Sales\Controller\Order\Reorder">
         <plugin name="vsynch-sales-limit-reorder" type="Vsynch\LimitSales\Observer\Sales\Reorder" sortOrder="1" />
     </type>
+    <type name="Magento\Checkout\Controller\Cart\Add">
+        <plugin name="vsynch-sales-limit-add" type="Vsynch\LimitSales\Observer\Sales\Add" sortOrder="1" />
+    </type>
 </config>
