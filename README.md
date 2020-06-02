@@ -1,5 +1,5 @@
 # Magento Limit Sales
-A Magento 2.3 module to set purchase limits per user on specific products. An optional time duration can also be set on the limit for each product.
+A Magento 2.3 module that enables shop administrators to set purchase limits on shop products for a specified period of time.
 
 ## Installation
 ```
