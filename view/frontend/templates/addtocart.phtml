@@ -135,12 +135,16 @@ if($customerId) {
                 </div>
             <?php endif; ?>
             <div class="actions">
-                <button type="submit"
-                        title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
-                        class="action primary tocart"
-                        id="product-addtocart-button" disabled>
-                    <span><?= $block->escapeHtml($buttonTitle) ?></span>
-                </button>
+                <?php if($check_sales_limit && !$customerId):?>
+                    <p style="background: #fae5e5;color: #4a1716;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
+                <?php else:?>
+                    <button type="submit"
+                            title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                            class="action primary tocart"
+                            id="product-addtocart-button" disabled>
+                        <span><?= $block->escapeHtml($buttonTitle) ?></span>
+                    </button>
+                <? endif ?>
                 <?= $block->getChildHtml('', true) ?>
             </div>
         </div>
