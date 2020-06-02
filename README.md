@@ -6,5 +6,5 @@ A Magento 2.3 module to set purchase limits per user on specific products. An op
 composer require vsynch/limit-sales
 ```
 
-##Usage
+## Usage
 
