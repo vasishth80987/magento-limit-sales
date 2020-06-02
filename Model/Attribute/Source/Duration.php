@@ -16,9 +16,11 @@ class Duration extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
     {
         if (!$this->_options) {
             $this->_options = [
-                ['label' => __('Select Duration'), 'value' => '0'],
-                ['label' => __('1 Min'), 'value' => '60'],
+                ['label' => __('Immediate'), 'value' => '0'],
+                ['label' => __('15 Mins'), 'value' => '900'],
+                ['label' => __('30 Mins'), 'value' => '1800'],
                 ['label' => __('1 Hour'), 'value' => '3600'],
+                ['label' => __('12 Hours'), 'value' => '43200'],
                 ['label' => __('1 Day'), 'value' => '86400'],
                 ['label' => __('3 Days'), 'value' => '259200'],
                 ['label' => __('5 Days'), 'value' => '432000'],
