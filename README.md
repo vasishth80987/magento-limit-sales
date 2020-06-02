@@ -14,7 +14,7 @@ Run Magento Upgrade
 php bin/magento setup:upgrade
 ```
 Disable Guest Checkout
-Follow steps detailed here https://docs.magento.com/user-guide/sales/checkout-guest.html#disable-guest-checkout
+`Follow steps detailed here https://docs.magento.com/user-guide/sales/checkout-guest.html#disable-guest-checkout`
 
 ## Usage
 
