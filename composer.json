@@ -1,5 +1,5 @@
 {
-    "name": "vsynchdi/limit-sales",
+    "name": "vsynch/limit-sales",
     "description": "A Magento 2.3 package to the set max amount of purchases that can be made for selected products within a specified time period.",
     "type": "module",
     "require": {
