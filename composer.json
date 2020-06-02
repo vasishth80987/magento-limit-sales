@@ -3,7 +3,7 @@
     "description": "A Magento 2.3 package to the set max amount of purchases that can be made for selected products within a specified time period.",
     "type": "module",
     "require": {
-        "php": "7.2",
+        "php": ">=7.2",
         "magento/framework": "102.0.*"
     },
     "license": "MIT",
