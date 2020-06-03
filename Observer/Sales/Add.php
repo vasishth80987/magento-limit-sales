@@ -102,7 +102,6 @@ class Add
 
     public function checkSalesLimit($productId,$customerId,$cart_entries){
 
-        if(!$customerId) return true;
 
         $product = $this->productFactory->create()->load($productId);
 
@@ -124,6 +123,11 @@ class Add
         $qtf = 0;
         $wait = false;
         $wait_time = 0;
+
+        if(!$customerId && $psl) {
+            $this->errors[] = "A Sales Limit Restriction has been set for this product. Please log in to add this product to cart!";
+            return false;
+        }
 
         if (empty($psl)) {
             return true;
