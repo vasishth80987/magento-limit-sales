@@ -12,6 +12,7 @@ composer require vsynch/limit-sales
 ### Run Magento Upgrade
 ```
 php bin/magento setup:upgrade
+php bin/magento cache:clean
 ```
 ### Disable Guest Checkout
 Follow steps detailed here, https://docs.magento.com/user-guide/sales/checkout-guest.html#disable-guest-checkout
