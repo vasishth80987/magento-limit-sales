@@ -135,7 +135,7 @@ if($customerId) {
                 </div>
             <?php endif; ?>
             <div class="actions">
-                <?php if($check_sales_limit && !$customerId):?>
+                <?php if(!empty($psl) && !$customerId):?>
                     <p style="background: #fae5e5;color: #4a1716;padding: 5px 10px;">This product can only be purchased by registered users. Please log in to add this product to cart!</p>
                     <a title="Login/Register"
                        class="action primary"
