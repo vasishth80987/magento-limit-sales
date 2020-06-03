@@ -60,6 +60,7 @@ class Add
     {
 
         $params = $this->request->getParams();
+        $resultRedirect = $this->resultRedirectFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
 
         try {
 
@@ -76,117 +77,28 @@ class Add
                 $qty = $filter->filter($params['qty']);
             }
 
-            $resultRedirect = $this->resultRedirectFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
-
             if(!$this->checkSalesLimit($productId,$customerId,$qty)){
-
-
                 $this->messageManager->addErrorMessage(
                     $this->objectManager->get(\Magento\Framework\Escaper::class)->escapeHtml('Could not Add Product(s) to Cart! '. implode(', ',$this->errors)). '. Reason: Limit Sales Restrictions in place!'
                 );
-
                 return $resultRedirect->setPath('/');
-
             }
+
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            if ($this->checkoutSession->getUseNotice(true)) {
-                $this->messageManager->addNoticeMessage(
-                    $this->objectManager->get(\Magento\Framework\Escaper::class)->escapeHtml($e->getMessage())
-                );
-            } else {
-                $messages = array_unique(explode("\n", $e->getMessage()));
-                foreach ($messages as $message) {
-                    $this->messageManager->addErrorMessage(
-                        $this->objectManager->get(\Magento\Framework\Escaper::class)->escapeHtml($message)
-                    );
-                }
-            }
+            $this->messageManager->addErrorMessage(
+                $this->objectManager->get(\Magento\Framework\Escaper::class)->escapeHtml($e->getMessage()));
 
-            $url = $this->checkoutSession->getRedirectUrl(true);
-
-            if (!$url) {
-                $url = $this->redirect->getRedirectUrl($this->url->getUrl('checkout/cart', ['_secure' => true]));
-            }
-
-            return $this->goBack($url);
+            return $resultRedirect->setPath('/');
         } catch (\Exception $e) {
             $this->messageManager->addExceptionMessage(
                 $e,
                 __('We can\'t add this item to your shopping cart right now.')
             );
             $this->objectManager->get(\Psr\Log\LoggerInterface::class)->critical($e);
-            return $this->goBack();
+            return $resultRedirect->setPath('/');
         }
         return $proceed();
     }
-
-    /**
-     * Resolve response
-     *
-     * @param string $backUrl
-     * @param \Magento\Catalog\Model\Product $product
-     * @return $this|\Magento\Framework\Controller\Result\Redirect
-     */
-    protected function goBack($backUrl = null, $product = null)
-    {
-        if (!$this->getRequest()->isAjax()) {
-            return parent::_goBack($backUrl);
-        }
-
-        $result = [];
-
-        if ($backUrl || $backUrl = $this->getBackUrl()) {
-            $result['backUrl'] = $backUrl;
-        } else {
-            if ($product && !$product->getIsSalable()) {
-                $result['product'] = [
-                    'statusText' => __('Out of stock')
-                ];
-            }
-        }
-
-        $this->getResponse()->representJson(
-            $this->objectManager->get(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($result)
-        );
-    }
-
-    /*
-    protected function getBackUrl($defaultUrl = null)
-    {
-        $returnUrl = $this->request->getParam('return_url');
-        if ($returnUrl && $this->isInternalUrl($returnUrl)) {
-            $this->messageManager->getMessages()->clear();
-            return $returnUrl;
-        }
-
-        if ($this->shouldRedirectToCart() || $this->request->getParam('in_cart')) {
-            if ($this->request->getActionName() == 'add' && !$this->request->getParam('in_cart')) {
-                $this->checkoutSession->setContinueShoppingUrl($this->redirect->getRefererUrl());
-            }
-            return $this->url->getUrl('checkout/cart');
-        }
-
-        return $defaultUrl;
-    }
-
-    private function shouldRedirectToCart()
-    {
-        return $this->scopeConfig->isSetFlag(
-            'checkout/cart/redirect_to_cart',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-    }
-
-    protected function _isInternalUrl($url)
-    {
-        if (strpos($url, 'http') === false) {
-            return false;
-        }
-        $store = $this->storeManager->getStore();
-        $unsecure = strpos($url, (string) $store->getBaseUrl()) === 0;
-        $secure = strpos($url, (string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK, true)) === 0;
-        return $unsecure || $secure;
-    }*/
 
     public function checkSalesLimit($productId,$customerId,$cart_entries){
 
